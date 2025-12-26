@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QTimer, QPoint, QPropertyAnimation, pyqtProperty
 from PyQt5.QtGui import QFont, QPalette, QColor, QPainter
-from PyQt5.QtMultimedia import QSound
+# 不再使用QSound，改为在方法内导入QSoundEffect
 
 class DebateHacker(QMainWindow):
     def __init__(self):
@@ -928,8 +928,18 @@ class EasterEggDialog(QDialog):
         try:
             # 尝试播放音乐文件
             # 使用QSoundEffect替代QSound，提供更好的兼容性
+            import sys
+            import os
             from PyQt5.QtMultimedia import QSoundEffect
             from PyQt5.QtCore import QUrl
+            
+            # 获取程序运行目录
+            if hasattr(sys, '_MEIPASS'):
+                # 如果是打包后的exe文件
+                base_path = sys._MEIPASS
+            else:
+                # 如果是直接运行的Python脚本
+                base_path = os.path.abspath('.')
             
             # 优先使用用户提供的音乐文件，然后是默认文件名
             music_files = ["M800004Wxqxk3oWPnp.mp3", "celebration.wav", "celebration.mp3"]
@@ -937,8 +947,10 @@ class EasterEggDialog(QDialog):
             
             for file in music_files:
                 try:
+                    # 构建完整的文件路径
+                    file_path = os.path.join(base_path, file)
                     sound_effect = QSoundEffect()
-                    sound_effect.setSource(QUrl.fromLocalFile(file))
+                    sound_effect.setSource(QUrl.fromLocalFile(file_path))
                     sound_effect.setVolume(0.5)  # 设置音量为50%
                     sound_effect.play()
                     music_played = True

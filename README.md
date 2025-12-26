@@ -59,12 +59,47 @@ python debate_hacker.py
 pip install pyinstaller
 ```
 
-2. 生成EXE文件
+2. 生成EXE文件（包含嵌入式音乐）
 ```bash
-pyinstaller --onefile --windowed debate_hacker.py
+pyinstaller debate_hacker.spec
 ```
 
 3. 在`dist`文件夹中找到生成的`debate_hacker.exe`文件
+
+## 🖼️ 程序截图
+
+### 主界面
+程序主界面展示了所有功能模块：
+
+![主界面截图](screenshots/main_window.png)
+
+### 票型透视功能
+实时显示三位评委的投票情况和统计结果：
+
+![票型透视截图](screenshots/vote_module.png)
+
+### 履历修改器
+管理不同类型比赛的履历数据：
+
+![履历修改器截图](screenshots/resume_module.png)
+
+## 📁 项目结构
+
+```
+dibetexiugaiq/
+├── debate_hacker.py     # 主应用程序
+├── debate_hacker.spec   # PyInstaller配置文件
+├── M800004Wxqxk3oWPnp.mp3  # 庆祝音乐文件
+├── .gitignore          # Git忽略文件
+├── README.md           # 项目说明文档
+├── LICENSE             # 许可证文件
+├── screenshots/        # 程序截图文件夹
+│   ├── main_window.png
+│   ├── vote_module.png
+│   └── resume_module.png
+├── build/              # 构建目录
+└── dist/               # 分发目录（包含EXE文件）
+```
 
 ## 🎨 界面说明
 
