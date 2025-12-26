@@ -3,10 +3,11 @@ import random
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGridLayout, QLabel, QPushButton, QLineEdit, QSlider, QCheckBox,
-    QGroupBox, QScrollArea, QFrame, QDialog
+    QGroupBox, QScrollArea, QFrame, QDialog, QMessageBox
 )
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QFont, QPalette, QColor
+from PyQt5.QtCore import Qt, QTimer, QPoint, QPropertyAnimation, pyqtProperty
+from PyQt5.QtGui import QFont, QPalette, QColor, QPainter
+from PyQt5.QtMultimedia import QSound
 
 class DebateHacker(QMainWindow):
     def __init__(self):
@@ -17,7 +18,7 @@ class DebateHacker(QMainWindow):
         
     def initUI(self):
         # 设置窗口
-        self.setWindowTitle('辩论修改器 v2.0')
+        self.setWindowTitle('辩论修改器 v1.0.2')
         self.setGeometry(100, 100, 900, 700)
         
         # 创建中央部件
@@ -811,6 +812,14 @@ class DebateHacker(QMainWindow):
         status_text += f'\n总履历条数: {total}'
         
         self.resume_count_label.setText(status_text.strip())
+        
+        # 检查彩蛋触发条件：无限制级或国际赛达到10+5+1或以上
+        for category in ['国际赛', '无限制级']:
+            counts = self.resume_data[category]
+            if counts[0] >= 10 and counts[1] >= 5 and counts[2] >= 1:
+                # 触发彩蛋
+                self.triggerEasterEgg()
+                break
     
     def clearResumeStats(self):
         """清空所有履历数据"""
@@ -823,6 +832,139 @@ class DebateHacker(QMainWindow):
     def updateStatus(self, label, value):
         if label in self.status_labels:
             self.status_labels[label].setText(value)
+    
+    def triggerEasterEgg(self):
+        """触发彩蛋"""
+        # 创建彩蛋弹窗
+        dialog = EasterEggDialog(self)
+        dialog.exec_()
+
+class EasterEggDialog(QDialog):
+    """彩蛋弹窗类"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('🎉 恭喜你达成10+5+1成就！')
+        self.resize(600, 400)
+        self.setStyleSheet("background-color: #282830;")
+        
+        # 布局
+        main_layout = QVBoxLayout(self)
+        
+        # 标题
+        title_label = QLabel('🎉 恭喜你达成10+5+1成就！🎉')
+        title_label.setFont(QFont('微软雅黑', 24, QFont.Bold))
+        title_label.setAlignment(Qt.AlignCenter)
+        title_label.setStyleSheet('color: #00ff00; margin: 20px 0;')
+        main_layout.addWidget(title_label)
+        
+        # 播放庆祝音乐
+        self.playCelebrationMusic()
+        
+        # 庆祝信息
+        celebration_label = QLabel('🎵 正在播放庆祝音乐 🎵')
+        celebration_label.setFont(QFont('微软雅黑', 18))
+        celebration_label.setAlignment(Qt.AlignCenter)
+        celebration_label.setStyleSheet('color: #ffff00; margin: 20px 0;')
+        main_layout.addWidget(celebration_label)
+        
+        # 用户输入区域
+        input_layout = QHBoxLayout()
+        name_label = QLabel('请输入你的名字:')
+        name_label.setFont(QFont('微软雅黑', 14))
+        name_label.setStyleSheet('color: #ffffff;')
+        
+        self.name_input = QLineEdit()
+        self.name_input.setFont(QFont('微软雅黑', 14))
+        self.name_input.setPlaceholderText('输入你的名字...')
+        self.name_input.setStyleSheet('''
+            QLineEdit {
+                background-color: #333;
+                color: #fff;
+                border: 2px solid #555;
+                border-radius: 5px;
+                padding: 8px;
+                min-width: 200px;
+            }
+        ''')
+        
+        submit_btn = QPushButton('确定')
+        submit_btn.setFont(QFont('微软雅黑', 14, QFont.Bold))
+        submit_btn.setStyleSheet('''
+            QPushButton {
+                background-color: #00ff00;
+                color: #000;
+                border: none;
+                border-radius: 5px;
+                padding: 8px 16px;
+            }
+            QPushButton:hover {
+                background-color: #00cc00;
+            }
+        ''')
+        submit_btn.clicked.connect(self.submitName)
+        
+        input_layout.addWidget(name_label)
+        input_layout.addWidget(self.name_input)
+        input_layout.addWidget(submit_btn)
+        input_layout.setAlignment(Qt.AlignCenter)
+        main_layout.addLayout(input_layout)
+        
+        # 信息显示区域
+        self.message_label = QLabel()
+        self.message_label.setFont(QFont('微软雅黑', 18, QFont.Bold))
+        self.message_label.setAlignment(Qt.AlignCenter)
+        self.message_label.setStyleSheet('color: #ff6b6b; margin-top: 30px; padding: 10px;')
+        main_layout.addWidget(self.message_label)
+        
+        # 添加装饰性元素
+        decor_label = QLabel('🏆 无敌辩手 🏆')
+        decor_label.setFont(QFont('微软雅黑', 20, QFont.Bold))
+        decor_label.setAlignment(Qt.AlignCenter)
+        decor_label.setStyleSheet('color: #ffd700; margin-top: 20px;')
+        main_layout.addWidget(decor_label)
+    
+    def playCelebrationMusic(self):
+        """播放庆祝音乐"""
+        try:
+            # 尝试播放音乐文件
+            # 使用QSoundEffect替代QSound，提供更好的兼容性
+            from PyQt5.QtMultimedia import QSoundEffect
+            from PyQt5.QtCore import QUrl
+            
+            # 优先使用用户提供的音乐文件，然后是默认文件名
+            music_files = ["M800004Wxqxk3oWPnp.mp3", "celebration.wav", "celebration.mp3"]
+            music_played = False
+            
+            for file in music_files:
+                try:
+                    sound_effect = QSoundEffect()
+                    sound_effect.setSource(QUrl.fromLocalFile(file))
+                    sound_effect.setVolume(0.5)  # 设置音量为50%
+                    sound_effect.play()
+                    music_played = True
+                    break
+                except Exception:
+                    continue
+            
+            if not music_played:
+                # 如果没有找到音乐文件，打印提示信息
+                print("未找到庆祝音乐文件，请确保M800004Wxqxk3oWPnp.mp3与程序放在同一目录")
+        except Exception as e:
+            # 如果发生其他错误，不影响程序运行
+            print(f"播放音乐时发生错误: {e}")
+    
+    def submitName(self):
+        """提交用户名并显示恭喜信息"""
+        name = self.name_input.text().strip()
+        if not name:
+            name = '辩手'
+        
+        message = f'恭喜你伟大的{name}你已经成为无敌的10+5+1！'
+        self.message_label.setText(message)
+        
+        # 禁用输入框和按钮
+        self.name_input.setEnabled(False)
+        self.sender().setEnabled(False)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
