@@ -7,7 +7,7 @@
 
 # 应用信息
 APP_NAME = "辩论修改器"
-APP_VERSION = "v1.0.2"
+APP_VERSION = "v1.2.2debugV.1"
 APP_TITLE = f"{APP_NAME} - Debate Hacker Pro"
 
 # 窗口配置

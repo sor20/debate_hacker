@@ -18,6 +18,7 @@ from modules.invincible_module import InvincibleModule
 from modules.resume_module import ResumeModule
 from modules.status_module import StatusModule
 from modules.easter_egg_module import EasterEggDialog
+from modules.listening_module import ListeningModule
 
 # 导入工具模块
 from utils.logger import setup_logger
@@ -85,7 +86,11 @@ class DebateHacker(QMainWindow):
         self.resume_module = ResumeModule()
         scroll_layout.addWidget(self.resume_module)
         
-        # 6. 状态显�?
+        # 6. 评委听感模块
+        self.listening_module = ListeningModule()
+        scroll_layout.addWidget(self.listening_module)
+        
+        # 7. 状态显示
         self.status_module = StatusModule()
         scroll_layout.addWidget(self.status_module)
         
@@ -112,7 +117,7 @@ class DebateHacker(QMainWindow):
     
     def initData(self):
         # 初始化数据（模块已处理大部分，这里仅保留主应用必要的数据）
-        pass
+        self.easter_egg_triggered = False  # 彩蛋是否已触发的标志
     
     def initConnections(self):
         # 辩手选择器信号连接
@@ -134,6 +139,9 @@ class DebateHacker(QMainWindow):
         
         # 履历模块信号连接
         self.resume_module.resume_changed.connect(self.onResumeChanged)
+        
+        # 评委听感模块信号连接
+        self.listening_module.listening_settings_changed.connect(self.onListeningSettingsChanged)
     
     # 新的信号处理方法
     def onNameChanged(self, name):
@@ -176,9 +184,27 @@ class DebateHacker(QMainWindow):
         else:
             self.updateStatus('最后操作', f'关闭{mode_name}')
     
+    def onListeningSettingsChanged(self, settings):
+        """处理评委听感设置变化"""
+        self.updateStatus('最后操作', '评委听感设置已更新')
+    
     def onResumeChanged(self):
         """处理履历更新"""
         self.updateStatus('最后操作', '履历已更新')
+        
+        if not self.easter_egg_triggered:
+            resume_data = self.resume_module.getResumeData()
+            total_a = sum(resume_data[category]['a'] for category in resume_data)
+            total_b = sum(resume_data[category]['b'] for category in resume_data)
+            total_c = sum(resume_data[category]['c'] for category in resume_data)
+            
+            # 添加用户友好的状态提示
+            status_text = f"当前进度：{total_a}/10, {total_b}/5, {total_c}/1"
+            self.updateStatus('彩蛋进度', status_text)
+            
+            if total_a >= 10 and total_b >= 5 and total_c >= 1:
+                self.easter_egg_triggered = True
+                self.triggerEasterEgg()
     
     # 时间模块方法
     
@@ -221,6 +247,10 @@ class DebateHacker(QMainWindow):
 
 
 if __name__ == '__main__':
+    # 启用高DPI支持
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
+    
     app = QApplication(sys.argv)
     window = DebateHacker()
     window.show()

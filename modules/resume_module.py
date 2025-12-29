@@ -160,10 +160,7 @@ class ResumeModule(QGroupBox):
         total_b = sum(self.resume_data[category]['b'] for category in self.resume_data)
         total_c = sum(self.resume_data[category]['c'] for category in self.resume_data)
         
-        stats_text = (f"当前统计情况：\n"  
-                     f"普通履历总数：{total_a} 份\n" 
-                     f"佳辩履历总数：{total_b} 份\n" 
-                     f"全程履历总数：{total_c} 份\n\n" 
+        stats_text = (f"当前履历：{total_a}+{total_b}+{total_c}\n\n"  
                      f"分类统计：\n")
         
         for category in self.resume_data:

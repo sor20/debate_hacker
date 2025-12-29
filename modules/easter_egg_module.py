@@ -10,7 +10,7 @@ import os
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QFont
-from PyQt5.QtMultimedia import QSoundEffect
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
 
 class EasterEggDialog(QDialog):
@@ -99,41 +99,35 @@ class EasterEggDialog(QDialog):
     
     def playCelebrationMusic(self):
         """播放庆祝音乐"""
+        # 简化音乐播放逻辑，避免影响弹窗显示
         try:
-            # 尝试播放音乐文件
-            # 使用QSoundEffect替代QSound，提供更好的兼容性
+            # 创建媒体播放器实例
+            self.media_player = QMediaPlayer()
+            self.media_player.setVolume(50)  # 设置音量为50%
             
             # 获取程序运行目录
             if hasattr(sys, '_MEIPASS'):
-                # 如果是打包后的exe文件
                 base_path = sys._MEIPASS
             else:
-                # 如果是直接运行的Python脚本
                 base_path = os.path.abspath('.')
             
             # 优先使用用户提供的音乐文件，然后是默认文件名
             music_files = ["M800004Wxqxk3oWPnp.mp3", "celebration.wav", "celebration.mp3"]
-            music_played = False
             
             for file in music_files:
                 try:
-                    # 构建完整的文件路径
                     file_path = os.path.join(base_path, file)
-                    sound_effect = QSoundEffect()
-                    sound_effect.setSource(QUrl.fromLocalFile(file_path))
-                    sound_effect.setVolume(0.5)  # 设置音量为50%
-                    sound_effect.play()
-                    music_played = True
-                    break
+                    if os.path.exists(file_path):
+                        media_content = QMediaContent(QUrl.fromLocalFile(file_path))
+                        self.media_player.setMedia(media_content)
+                        self.media_player.play()
+                        break
                 except Exception:
-                    continue
-            
-            if not music_played:
-                # 如果没有找到音乐文件，打印提示信息
-                print("未找到庆祝音乐文件，请确保M800004Wxqxk3oWPnp.mp3与程序放在同一目录")
-        except Exception as e:
-            # 如果发生其他错误，不影响程序运行
-            print(f"播放音乐时发生错误: {e}")
+                    # 忽略音乐播放错误，确保弹窗正常显示
+                    pass
+        except Exception:
+            # 完全忽略音乐播放错误，不影响弹窗功能
+            pass
     
     def submitName(self):
         """提交用户名并显示恭喜信息"""

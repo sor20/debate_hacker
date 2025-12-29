@@ -6,7 +6,7 @@
 """
 
 import random
-from PyQt5.QtWidgets import QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QPushButton, QCheckBox
+from PyQt5.QtWidgets import QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QPushButton, QCheckBox, QRadioButton
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer
 from PyQt5.QtGui import QFont
 
@@ -79,6 +79,29 @@ class VoteModule(QGroupBox):
         self.result_display.setFont(QFont('微软雅黑', 18, QFont.Bold))
         self.result_display.setStyleSheet('padding: 10px; color: #00ff00;')
         
+        # 强制数据验证区域
+        validation_group = QGroupBox('强制数据验证')
+        validation_layout = QVBoxLayout()
+        
+        # 创建单选按钮组
+        self.validation_radio1 = QRadioButton('检证对方重要数据')
+        self.validation_radio2 = QRadioButton('检证对方大部分数据')
+        self.validation_radio3 = QRadioButton('检证对方全部数据')
+        
+        # 设置默认选中第一个选项
+        self.validation_radio1.setChecked(True)
+        
+        # 设置字体
+        font = QFont('微软雅黑', 11)
+        self.validation_radio1.setFont(font)
+        self.validation_radio2.setFont(font)
+        self.validation_radio3.setFont(font)
+        
+        validation_layout.addWidget(self.validation_radio1)
+        validation_layout.addWidget(self.validation_radio2)
+        validation_layout.addWidget(self.validation_radio3)
+        validation_group.setLayout(validation_layout)
+        
         # 控制按钮
         control_layout = QHBoxLayout()
         self.show_votes_btn = QPushButton('开启票型透视')
@@ -93,6 +116,7 @@ class VoteModule(QGroupBox):
         group_layout.addLayout(judges_layout)
         group_layout.addWidget(self.stats_display)
         group_layout.addWidget(self.result_display)
+        group_layout.addWidget(validation_group)
         group_layout.addLayout(control_layout)
         
         self.setLayout(group_layout)
