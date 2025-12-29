@@ -90,13 +90,27 @@ dibetexiugaiq/
 ├── debate_hacker.py     # 主应用程序
 ├── debate_hacker.spec   # PyInstaller配置文件
 ├── M800004Wxqxk3oWPnp.mp3  # 庆祝音乐文件
+├── CHANGELOG.md        # 更新日志文件
 ├── .gitignore          # Git忽略文件
 ├── README.md           # 项目说明文档
 ├── LICENSE             # 许可证文件
-├── screenshots/        # 程序截图文件夹
-│   ├── main_window.png
-│   ├── vote_module.png
-│   └── resume_module.png
+├── modules/            # 功能模块目录
+│   ├── debater_selector.py
+│   ├── easter_egg_module.py
+│   ├── favor_module.py
+│   ├── invincible_module.py
+│   ├── resume_module.py
+│   ├── status_module.py
+│   ├── time_module.py
+│   └── vote_module.py
+├── utils/              # 工具模块目录
+│   ├── constants.py
+│   ├── logger.py
+│   └── ui_utils.py
+├── wiki/               # 项目文档目录
+│   ├── FAQ.md
+│   ├── ProjectStructure.md
+│   └── UsageGuide.md
 ├── build/              # 构建目录
 └── dist/               # 分发目录（包含EXE文件）
 ```
